@@ -18,14 +18,14 @@ module CloudLB
       headers = response.headers_hash
       if (response.code.to_s == "204")
         connection.authtoken = headers["x-auth-token"]
-        user_id = headers["x-server-management-url"].match(/.*\/(\d+)$/)[1]
-        headers["x-server-management-url"] = "https://#{connection.region}.loadbalancers.api.rackspacecloud.com/v1.0/#{user_id}"
-        connection.lbmgmthost = URI.parse(headers["x-server-management-url"]).host
-        connection.lbmgmtpath = URI.parse(headers["x-server-management-url"]).path.chomp
+        user_id = headers["X-Server-Management-Url"].match(/.*\/(\d+)$/)[1]
+        headers["X-Server-Management-Url"] = "https://#{connection.region}.loadbalancers.api.rackspacecloud.com/v1.0/#{user_id}"
+        connection.lbmgmthost = URI.parse(headers["X-Server-Management-Url"]).host
+        connection.lbmgmtpath = URI.parse(headers["X-Server-Management-Url"]).path.chomp
         # Force the path into the v1.0 URL space
         connection.lbmgmtpath.sub!(/\/.*?\//, '/v1.0/')
-        connection.lbmgmtport = URI.parse(headers["x-server-management-url"]).port
-        connection.lbmgmtscheme = URI.parse(headers["x-server-management-url"]).scheme
+        connection.lbmgmtport = URI.parse(headers["X-Server-Management-Url"]).port
+        connection.lbmgmtscheme = URI.parse(headers["X-Server-Management-Url"]).scheme
         connection.authok = true
       else
         connection.authtoken = false
