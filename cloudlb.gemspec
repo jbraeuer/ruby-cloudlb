@@ -32,6 +32,7 @@ Gem::Specification.new do |s|
     "lib/cloudlb/node.rb",
     "lib/cloudlb/health_monitor.rb",
     "lib/cloudlb/connection_throttle.rb",
+    "lib/cloudlb/ssl_termination.rb",
     "lib/cloudlb/version.rb"
   ]
   s.require_path = 'lib'
