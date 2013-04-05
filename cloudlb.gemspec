@@ -3,7 +3,7 @@ lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
 require File.expand_path('../lib/cloudlb/version', __FILE__)
- 
+
 Gem::Specification.new do |s|
   s.name        = "cloudlb"
   s.version     = CloudLB::VERSION
@@ -13,12 +13,12 @@ Gem::Specification.new do |s|
   s.homepage    = "http://github.com/rackspace/ruby-cloudlb"
   s.summary     = "Ruby API into the Rackspace Cloud Load Balancers product"
   s.description = "A Ruby API to manage the Rackspace Cloud Load Balancers product"
- 
+
   s.required_rubygems_version = ">= 1.3.6"
- 
+
   s.add_runtime_dependency "typhoeus"
   s.add_runtime_dependency "json"
- 
+
   s.files = [
     "COPYING",
     ".gitignore",
