@@ -1,6 +1,6 @@
 module CloudLB
   class Connection
-    
+
     attr_reader   :authuser
     attr_reader   :authkey
     attr_accessor :authtoken
@@ -11,7 +11,7 @@ module CloudLB
     attr_accessor :lbmgmtscheme
     attr_reader   :auth_url
     attr_reader   :region
-    
+
     # Creates a new CloudLB::Connection object.  Uses CloudLB::Authentication to perform the login for the connection.
     #
     # Setting the retry_auth option to false will cause an exception to be thrown if your authorization token expires.
@@ -29,7 +29,7 @@ module CloudLB
     #   :retry_auth - Whether to retry if your auth token expires (defaults to true)
     #
     #   lb = CloudLB::Connection.new(:username => 'YOUR_USERNAME', :api_key => 'YOUR_API_KEY', :region => :dfw)
-    def initialize(options = {:retry_auth => true}) 
+    def initialize(options = {:retry_auth => true})
       @authuser = options[:username] || (raise CloudLB::Exception::Authentication, "Must supply a :username")
       @authkey = options[:api_key] || (raise CloudLB::Exception::Authentication, "Must supply an :api_key")
       @region = options[:region] || (raise CloudLB::Exception::Authentication, "Must supply a :region")
@@ -40,7 +40,7 @@ module CloudLB
       @http = {}
       CloudLB::Authentication.new(self)
     end
-    
+
     # Returns true if the authentication was successful and returns false otherwise.
     #
     #   lb.authok?
@@ -48,7 +48,7 @@ module CloudLB
     def authok?
       @authok
     end
-    
+
     # Returns the list of available load balancers.  By default, it hides deleted load balancers (which hang around unusable
     # for 90 days). To show all load balancers, including deleted ones, pass in :show_deleted => true.
     #
@@ -69,7 +69,7 @@ module CloudLB
       return options[:show_deleted] == true ? balancers : balancers.select{|lb| lb[:status] != "DELETED"}
     end
     alias :load_balancers :list_load_balancers
-    
+
     # Returns a CloudLB::Balancer object for the given load balancer ID number.
     #
     #    >> lb.get_load_balancer(2)
@@ -77,7 +77,7 @@ module CloudLB
       CloudLB::Balancer.new(self,id)
     end
     alias :load_balancer :get_load_balancer
-    
+
     # Creates a brand new load balancer under your account.
     #
     # A minimal request must pass in :name, :protocol, :port, :nodes, and either :virtual_ip_ids or :virtual_ip_types.
@@ -86,7 +86,7 @@ module CloudLB
     # :name - the name of the load balancer.  Limted to 128 characters or less.
     # :protocol - the protocol to balance. Must be a valid protocol. Get the list of available protocols with the list_protocols
     #             command. Supported in the latest docs are: HTTP, HTTPS, FTP, IMAPv4, IMAPS, POP3, POP3S, LDAP, LDAPS, SMTP
-    # :nodes - An array of hashes for each node to be balanced.  The hash should contain the address of the target server, 
+    # :nodes - An array of hashes for each node to be balanced.  The hash should contain the address of the target server,
     #          the port on the target server, and the condition ("ENABLED", "DISABLED", "DRAINING"). Optionally supply a :weight for use
     #          in the WEIGHTED_ algorithms.
     #          {:address => "1.2.3.4", :port => "80", :condition => "ENABLED", :weight => 1}
@@ -118,7 +118,7 @@ module CloudLB
       body = JSON.parse(response.body)['loadBalancer']
       return get_load_balancer(body["id"])
     end
-    
+
     # Returns a list of protocols that are currently supported by the Cloud Load Balancer product.
     #
     #   >> lb.list_protocols
@@ -126,10 +126,10 @@ module CloudLB
     def list_protocols
       response = lbreq("GET",lbmgmthost,"#{lbmgmtpath}/loadbalancers/protocols",lbmgmtport,lbmgmtscheme,{})
       CloudLB::Exception.raise_exception(response) unless response.code.to_s.match(/^20.$/)
-      CloudLB.symbolize_keys(JSON.parse(response.body)["protocols"])    
+      CloudLB.symbolize_keys(JSON.parse(response.body)["protocols"])
     end
     alias :protocols :list_protocols
-    
+
     # Returns a list of balancer algorithms that are currently supported by the Cloud Load Balancer product.
     #
     #   >> lb.list_algorithms
@@ -137,11 +137,11 @@ module CloudLB
     def list_algorithms
       response = lbreq("GET",lbmgmthost,"#{lbmgmtpath}/loadbalancers/algorithms",lbmgmtport,lbmgmtscheme,{})
       CloudLB::Exception.raise_exception(response) unless response.code.to_s.match(/^20.$/)
-      CloudLB.symbolize_keys(JSON.parse(response.body)["algorithms"])    
-    end      
+      CloudLB.symbolize_keys(JSON.parse(response.body)["algorithms"])
+    end
     alias :algorithms :list_algorithms
-    
-    
+
+
     # This method actually makes the HTTP REST calls out to the server. Relies on the thread-safe typhoeus
     # gem to do the heavy lifting.  Never called directly.
     def lbreq(method,server,path,port,scheme,headers = {},data = nil,attempts = 0) # :nodoc:
@@ -162,7 +162,7 @@ module CloudLB
                                       :verbose       => ENV['LOADBALANCERS_VERBOSE'] ? true : false)
       CloudLB.hydra.queue(request)
       CloudLB.hydra.run
-      
+
       response = request.response
       print "DEBUG: Body is #{response.body}\n" if ENV['LOADBALANCERS_VERBOSE']
       raise CloudLB::Exception::ExpiredAuthToken if response.code.to_s == "401"
@@ -179,10 +179,10 @@ module CloudLB
       CloudLB::Authentication.new(self)
       retry
     end
-    
-    
+
+
     private
-    
+
     # Sets up standard HTTP headers
     def headerprep(headers = {}) # :nodoc:
       default_headers = {}
@@ -193,7 +193,7 @@ module CloudLB
       default_headers["Content-Type"] = "application/json"
       default_headers["User-Agent"] = "Cloud Load Balancers Ruby API #{VERSION}"
       default_headers.merge(headers)
-    end    
-        
+    end
+
   end
 end

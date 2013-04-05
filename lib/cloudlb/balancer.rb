@@ -1,6 +1,6 @@
 module CloudLB
   class Balancer
-    
+
     attr_reader :id
     attr_reader :name
     attr_reader :protocol
@@ -9,7 +9,7 @@ module CloudLB
     attr_reader :algorithm
     attr_reader :connection_logging
     attr_reader :status
-    
+
     # Creates a new CloudLB::Balancer object representing a Load Balancer instance.
     def initialize(connection,id)
       @connection    = connection
@@ -21,7 +21,7 @@ module CloudLB
       populate
       return self
     end
-    
+
     # Updates the information about the current Balancer object by making an API call.
     def populate
       response = @connection.lbreq("GET",@lbmgmthost,"#{@lbmgmtpath}/loadbalancers/#{CloudLB.escape(@id.to_s)}",@lbmgmtport,@lbmgmtscheme)
@@ -37,7 +37,7 @@ module CloudLB
       true
     end
     alias :refresh :populate
-  
+
     # Lists the virtual IP addresses associated with this Balancer
     #
     #    >> b.list_virtual_ips
@@ -48,7 +48,7 @@ module CloudLB
       CloudLB.symbolize_keys(JSON.parse(response.body)["virtualIps"])
     end
     alias :virtual_ips :list_virtual_ips
-    
+
     # Lists the backend nodes that this Balancer sends traffic to.
     #
     #    >> b.list_nodes
@@ -59,13 +59,13 @@ module CloudLB
       CloudLB.symbolize_keys(JSON.parse(response.body)["nodes"])
     end
     alias :nodes :list_nodes
-    
+
     # Returns a CloudLB::Node object for the given node id.
     def get_node(id)
       CloudLB::Node.new(self,id)
     end
     alias :node :get_node
-    
+
     # Creates a brand new backend node and associates it with the current load balancer.  Returns the new Node object.
     #
     # Options include:
@@ -147,14 +147,14 @@ module CloudLB
       CloudLB::Exception.raise_exception(response) unless response.code.to_s.match(/^202$/)
       true
     end
-    
+
     # TODO: Figure out formats for startTime and endTime
     def usage
       response = @connection.lbreq("GET",@lbmgmthost,"#{@lbmgmtpath}/loadbalancers/#{CloudLB.escape(@id.to_s)}/usage",@lbmgmtport,@lbmgmtscheme,{})
       CloudLB::Exception.raise_exception(response) unless response.code.to_s.match(/^20.$/)
       CloudLB.symbolize_keys(JSON.parse(response.body)["loadBalancerUsageRecords"])
     end
-    
+
     # Returns either true or false if connection logging is enabled for this load balancer.
     #
     #    >> balancer.connection_logging?
@@ -164,7 +164,7 @@ module CloudLB
       CloudLB::Exception.raise_exception(response) unless response.code.to_s.match(/^20.$/)
       JSON.parse(response.body)["connectionLogging"]["enabled"]
     end
-    
+
     # Pass either true or false in to enable or disable connection logging for this load balancer. Returns true if successful,
     # raises execption otherwise.
     #
@@ -185,7 +185,7 @@ module CloudLB
       body = {"name" => new_name}
       update(body)
     end
-    
+
     # Sets a new balancer algorithm for the current load balancer. Must be a valid algorithm as returned by the
     # CloudLB::Connection.list_algorithms call.
     def algorithm=(new_algorithm="")
@@ -193,7 +193,7 @@ module CloudLB
       body = {"algorithm" => new_algorithm.to_s.upcase}
       update(body)
     end
-    
+
     # Sets a new port for the current load balancer to listen upon.
     def port=(new_port="")
       (raise CloudLB::Exception::MissingArgument, "Must provide a new port") if new_port.to_s.empty?
@@ -201,7 +201,7 @@ module CloudLB
       body = {"port" => new_port.to_s}
       update(body)
     end
-    
+
     # Sets a new protocol for the current load balancer to manage.  Must be a valid protocol as returned by the
     # CloudLB::Connection.list_protocols call.
     def protocol=(new_protocol="")
@@ -209,14 +209,14 @@ module CloudLB
       body = {"protocol" => new_protocol}
       update(body)
     end
-    
+
     # Checks to see whether or not the load balancer is using HTTP cookie session persistence.  Returns true if it is, false otherwise.
     def session_persistence?
       response = @connection.lbreq("GET",@lbmgmthost,"#{@lbmgmtpath}/loadbalancers/#{CloudLB.escape(@id.to_s)}/sessionpersistence",@lbmgmtport,@lbmgmtscheme,{})
       CloudLB::Exception.raise_exception(response) unless response.code.to_s.match(/^20.$/)
       JSON.parse(response.body)["sessionPersistence"]["persistenceType"] == "HTTP_COOKIE" ? true : false
     end
-    
+
     # Allows toggling of HTTP cookie session persistence.  Valid values are true and false to enable or disable, respectively.
     # FIXME - Trying to set the persistence to true is currently returning an undocumented 405 error.
     def session_persistence=(value)
@@ -230,7 +230,7 @@ module CloudLB
       CloudLB::Exception.raise_exception(response) unless response.code.to_s.match(/^20.$/)
       true
     end
-    
+
     # Returns the current access control list for the load balancer.
     def list_access_list
       response = @connection.lbreq("GET",@lbmgmthost,"#{@lbmgmtpath}/loadbalancers/#{CloudLB.escape(@id.to_s)}/accesslist",@lbmgmtport,@lbmgmtscheme,{})
@@ -238,10 +238,10 @@ module CloudLB
       JSON.parse(response.body)["accessList"]
     end
     alias :access_list :list_access_list
-    
-    # Adds an entry to your access list. You must supply the :address (an IP address) and :type (either ALLOW or DENY). 
+
+    # Adds an entry to your access list. You must supply the :address (an IP address) and :type (either ALLOW or DENY).
     # Items that are configured with the ALLOW type will always take precedence over items with the DENY type.
-    # 
+    #
     #     >> balancer.add_to_access_list(:address => '192.168.5.99', :type => 'DENY')
     #     => true
     #     >> b.list_access_list
@@ -253,7 +253,7 @@ module CloudLB
       CloudLB::Exception.raise_exception(response) unless response.code.to_s.match(/^20.$/)
       true
     end
-    
+
     # Deletes the entire access list for this load balancer, removing all entries. Returns true if successful, raises
     # an exception otherwise.
     #
@@ -264,7 +264,7 @@ module CloudLB
       CloudLB::Exception.raise_exception(response) unless response.code.to_s.match(/^20.$/)
       true
     end
-    
+
     # Deletes one member of the access list by id.
     #
     #    >> balancer.delete_access_list_member(95)
@@ -274,26 +274,26 @@ module CloudLB
       CloudLB::Exception.raise_exception(response) unless response.code.to_s.match(/^20.$/)
       true
     end
-    
+
     def get_health_monitor
       CloudLB::HealthMonitor.new(self)
     end
     alias :health_monitor :get_health_monitor
-    
+
     def get_connection_throttle
       CloudLB::ConnectionThrottle.new(self)
     end
     alias :connection_throttle :get_connection_throttle
-    
+
     private
-    
+
     def update(body)
       response = @connection.lbreq("PUT", @lbmgmthost, "#{@lbmgmtpath}/loadbalancers/#{CloudLB.escape(@id.to_s)}",@lbmgmtport,@lbmgmtscheme,{},body.to_json)
       CloudLB::Exception.raise_exception(response) unless response.code.to_s.match(/^20.$/)
       populate
       true
     end
-      
-    
-  end  
+
+
+  end
 end
