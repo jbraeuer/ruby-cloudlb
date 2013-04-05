@@ -1,2 +1,4 @@
 *.gem
+*.deb
 Gemfile.lock
+*~
