@@ -66,6 +66,15 @@ module CloudLB
     end
     alias :node :get_node
 
+    #
+    # Easy way to iterate over all node objects of a balancer
+    #
+    def each_node
+      list_nodes.each do |node|
+        yield node
+      end
+    end
+
     # Creates a brand new backend node and associates it with the current load balancer.  Returns the new Node object.
     #
     # Options include:

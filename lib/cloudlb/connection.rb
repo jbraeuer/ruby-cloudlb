@@ -78,6 +78,22 @@ module CloudLB
     end
     alias :load_balancer :get_load_balancer
 
+    #
+    # Iterate over all loadbalancers
+    #
+    def each_load_balancer
+      ids = list_load_balancers.map { |l| l[:id] }
+      last = ids.pop
+
+      ids.each do |id|
+        yield get_load_balancer(id)
+        # Otherwise we hit the API rate limits
+        sleep(1)
+      end
+
+      yield get_load_balancer(last) if last
+    end
+
     # Creates a brand new load balancer under your account.
     #
     # A minimal request must pass in :name, :protocol, :port, :nodes, and either :virtual_ip_ids or :virtual_ip_types.
