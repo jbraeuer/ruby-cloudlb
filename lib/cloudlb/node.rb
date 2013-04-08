@@ -7,6 +7,7 @@ module CloudLB
     attr_reader :port
     attr_reader :weight
     attr_reader :status
+    attr_reader :type
 
     # Initializes a new CloudLB::Node object
     def initialize(load_balancer,id)
@@ -32,6 +33,7 @@ module CloudLB
       @port      = data["port"]
       @weight    = data["weight"]
       @status    = data["status"]
+      @type      = data["type"]
       true
     end
     alias :refresh :populate
@@ -40,6 +42,13 @@ module CloudLB
     def condition=(data)
       (raise CloudLB::Exception::MissingArgument, "Must provide a new node condition") if data.to_s.empty?
       body = {"condition" => data.to_s.upcase}
+      update(body)
+    end
+
+    # Allows you to change type of the current Node. Values should be either "PRIMARY" or "SECONDARY"
+    def type=(data)
+      (raise CloudLB::Exception::MissingArgument, "Must provide a new node type") if data.to_s.empty?
+      body = {"type" => data.to_s.upcase}
       update(body)
     end
 
