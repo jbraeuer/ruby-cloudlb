@@ -13,10 +13,10 @@ module CloudLB
       @connection    = load_balancer.connection
       @load_balancer = load_balancer
       @id            = id
-      @lbmgmthost   = @connection.lbmgmthost
-      @lbmgmtpath   = @connection.lbmgmtpath
-      @lbmgmtport   = @connection.lbmgmtport
-      @lbmgmtscheme = @connection.lbmgmtscheme
+      @lbmgmthost    = @connection.lbmgmthost
+      @lbmgmtpath    = @connection.lbmgmtpath
+      @lbmgmtport    = @connection.lbmgmtport
+      @lbmgmtscheme  = @connection.lbmgmtscheme
       populate
       return self
     end
@@ -26,12 +26,12 @@ module CloudLB
       response = @connection.lbreq("GET",@lbmgmthost,"#{@lbmgmtpath}/loadbalancers/#{CloudLB.escape(@load_balancer.id.to_s)}/nodes/#{CloudLB.escape(@id.to_s)}",@lbmgmtport,@lbmgmtscheme)
       CloudLB::Exception.raise_exception(response) unless response.code.to_s.match(/^20.$/)
       data = JSON.parse(response.body)['node']
-      @id                    = data["id"]
-      @address                  = data["address"]
-      @condition              = data["condition"]
-      @port                  = data["port"]
-      @weight             = data["weight"]
-      @status                = data["status"]
+      @id        = data["id"]
+      @address   = data["address"]
+      @condition = data["condition"]
+      @port      = data["port"]
+      @weight    = data["weight"]
+      @status    = data["status"]
       true
     end
     alias :refresh :populate
