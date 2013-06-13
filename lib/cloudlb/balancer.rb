@@ -9,6 +9,7 @@ module CloudLB
     attr_reader :algorithm
     attr_reader :connection_logging
     attr_reader :status
+    attr_reader :ssl
 
     # Creates a new CloudLB::Balancer object representing a Load Balancer instance.
     def initialize(connection,id)
@@ -148,6 +149,18 @@ module CloudLB
       response = @connection.lbreq("PUT", @lbmgmthost, "#{@lbmgmtpath}/loadbalancers/#{CloudLB.escape(@id.to_s)}/ssltermination",@lbmgmtport,@lbmgmtscheme,{}, body)
       CloudLB::Exception.raise_exception(response) unless response.code.to_s.match(/^20.$/)
       return CloudLB::SSLTermination.new(self)
+    end
+
+    def get_ssl_termination
+      @ssl ||= CloudLB::SSLTermination.new(self)
+      @ssl
+    rescue CloudLB::Exception::Other
+      nil
+    end
+
+    def has_ssl_termination?
+      get_ssl_termination
+      !!@ssl && @ssl.enabled?
     end
 
     # Deletes the current load balancer object.  Returns true if successful, raises an exception otherwise.
