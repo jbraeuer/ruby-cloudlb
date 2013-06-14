@@ -154,7 +154,7 @@ module CloudLB
     def get_ssl_termination
       CloudLB::SSLTermination.new(self)
     rescue CloudLB::Exception::Other
-      nil
+      false
     end
     alias :ssl_termination :get_ssl_termination
 
