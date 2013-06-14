@@ -160,7 +160,7 @@ module CloudLB
 
     def has_ssl_termination?
       get_ssl_termination
-      !!@ssl && @ssl.enabled?
+      @ssl && @ssl.enabled?
     end
 
     # Deletes the current load balancer object.  Returns true if successful, raises an exception otherwise.
