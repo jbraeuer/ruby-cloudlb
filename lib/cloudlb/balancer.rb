@@ -157,8 +157,9 @@ module CloudLB
     rescue CloudLB::Exception::Other
       nil
     end
+    alias :ssl_termination :get_ssl_termination
 
-    def has_ssl_termination?
+    def ssl_termination?
       get_ssl_termination
       @ssl && @ssl.enabled?
     end
